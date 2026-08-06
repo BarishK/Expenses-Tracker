@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { login } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,17 +17,25 @@ import { delay } from "@/lib/delay";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await login({ email, password });
+      const res = await login({ email, password });
+
+      // Yanıttan token dönüyorsa cookie'yi istemci tarafında garantiye al
+      if (res?.data?.token) {
+        document.cookie = `token=${res.data.token}; path=/; max-age=3600; SameSite=None; Secure`;
+      }
+
       toast.success("Sign in successful. Redirecting...", {
         position: "top-center",
       });
-      await delay(2000);
-      router.push("/");
+
+      await delay(1000);
+
+      // SPA yönlendirmesi yerine tam sayfa yönlendirmesi yapılarak cookie sıfırlanır
+      window.location.href = "/";
     } catch (error) {
       toast.error("Incorrect email or password", { position: "top-center" });
     }

@@ -51,15 +51,15 @@ export const login = (req, res) => {
       expiresIn: "1h",
     });
 
-    const isProduction = process.env.NODE_ENV === "production";
-
+    // Cross-domain (Vercel -> Render) cookie transferi için:
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      httpOnly: false, // ClientLayout.js (document.cookie) okuyabilsin diye false olmalı
+      secure: true, // HTTPS uyuşmazlığı yaşamamak için canlıda her zaman true
+      sameSite: "none", // Farklı domainler arası cookie paylaşımı için şart
       maxAge: 3600000,
     });
 
-    res.json({ message: "Giriş başarılı" });
+    // Token'ı yanıt gövdesinde de gönder
+    res.json({ message: "Giriş başarılı", token });
   });
 };
