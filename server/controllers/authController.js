@@ -45,13 +45,18 @@ export const login = (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) return res.status(401).json({ message: "Hatalı şifre" });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, "SECRET_KEY", {
+    const secret = process.env.JWT_SECRET || "SECRET_KEY";
+
+    const token = jwt.sign({ id: user.id, email: user.email }, secret, {
       expiresIn: "1h",
     });
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 3600000,
     });
 

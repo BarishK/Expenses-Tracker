@@ -10,12 +10,25 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:3001",
+  process.env.CLIENT_URL, // Vercel canlı URL'i buraya gelecek
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: function (origin, callback) {
+      // Postman veya origin göndermeyen istekler için izin ver
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS politikasınca engellendi: " + origin));
+      }
+    },
     credentials: true,
   }),
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
