@@ -1,3 +1,5 @@
+https://expenses-tracker-puce-chi.vercel.app/
+
 # 💰 Expense Tracker
 
 A full-stack personal finance and expense tracking application built with **Next.js**, **Node.js**, and **MySQL**.
