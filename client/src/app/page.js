@@ -9,35 +9,11 @@ import { getDashboardCharts } from "@/services/dashboardService";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
-// Recharts bileşenlerini SSR kapalı şekilde import ediyoruz (Vercel Build 404 düzeltmesi)
-const ResponsiveContainer = dynamic(
-  () => import("recharts").then((mod) => mod.ResponsiveContainer),
+// Tüm grafik mantığını taşıdığımız bileşeni SSR kapalı çağırıyoruz
+const CategoryPieChart = dynamic(
+  () => import("@/components/CategoryPieChart"),
   { ssr: false },
 );
-const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), {
-  ssr: false,
-});
-const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), {
-  ssr: false,
-});
-const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), {
-  ssr: false,
-});
-const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), {
-  ssr: false,
-});
-const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend), {
-  ssr: false,
-});
-
-const COLORS = [
-  "#ef4444",
-  "#3b82f6",
-  "#eab308",
-  "#10b981",
-  "#8b5cf6",
-  "#ec4899",
-];
 
 export default function Dashboard() {
   const [currencySymbol, setCurrencySymbol] = useState("$");
@@ -149,49 +125,19 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[320px] w-full">
+            <div className="h-[320px] w-full flex items-center justify-center">
               {!mounted ? (
-                <div className="flex h-full items-center justify-center">
-                  <Spinner />
-                </div>
+                <Spinner />
               ) : chartData.expensesByCategory.length === 0 ? (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
+                <div className="text-muted-foreground">
                   No expense data available yet.
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1f2937",
-                        borderRadius: "8px",
-                        border: "none",
-                      }}
-                      formatter={(value) => [
-                        `${value}${currencySymbol}`,
-                        "Amount",
-                      ]}
-                    />
-                    <Legend />
-                    <Pie
-                      data={chartData.expensesByCategory}
-                      dataKey="total"
-                      nameKey="category"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={90}
-                      innerRadius={55}
-                      paddingAngle={4}
-                    >
-                      {chartData.expensesByCategory.map((_, index) => (
-                        <Cell
-                          key={`expense-cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                <CategoryPieChart
+                  data={chartData.expensesByCategory}
+                  currencySymbol={currencySymbol}
+                  colorOffset={0}
+                />
               )}
             </div>
           </CardContent>
@@ -204,49 +150,19 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[320px] w-full">
+            <div className="h-[320px] w-full flex items-center justify-center">
               {!mounted ? (
-                <div className="flex h-full items-center justify-center">
-                  <Spinner />
-                </div>
+                <Spinner />
               ) : chartData.incomesByCategory.length === 0 ? (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
+                <div className="text-muted-foreground">
                   No income data available yet.
                 </div>
               ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1f2937",
-                        borderRadius: "8px",
-                        border: "none",
-                      }}
-                      formatter={(value) => [
-                        `${value}${currencySymbol}`,
-                        "Amount",
-                      ]}
-                    />
-                    <Legend />
-                    <Pie
-                      data={chartData.incomesByCategory}
-                      dataKey="total"
-                      nameKey="category"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={90}
-                      innerRadius={55}
-                      paddingAngle={4}
-                    >
-                      {chartData.incomesByCategory.map((_, index) => (
-                        <Cell
-                          key={`income-cell-${index}`}
-                          fill={COLORS[(index + 2) % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                <CategoryPieChart
+                  data={chartData.incomesByCategory}
+                  currencySymbol={currencySymbol}
+                  colorOffset={2}
+                />
               )}
             </div>
           </CardContent>
