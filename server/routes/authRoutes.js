@@ -5,14 +5,15 @@ const router = express.Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/logout", (req, res) => {
-  const isProduction = process.env.NODE_ENV === "production";
 
+router.post("/logout", (req, res) => {
   res.clearCookie("token", {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+    httpOnly: false, // login'de false yaptığımız için silerken de false olmalı
+    secure: true, // Cross-site çalıştığı için her zaman true
+    sameSite: "none",
   });
+
   res.json({ message: "Çıkış başarılı" });
 });
 
