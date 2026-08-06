@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
-export function middleware(request) {
-  const token = request.cookies.get("token");
+export function proxy(request) {
+  // .value ekleyerek string değerini alıyoruz
+  const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
 
-  // Eğer token yoksa ve kullanıcı korunmalı bir sayfaya girmeye çalışıyorsa login'e at
-  // Korunmalı sayfalar: Ana sayfa (/), /transactions ve /settings
+  // Token yoksa ve korunan sayfaya girilmek isteniyorsa login'e yönlendir
   if (
     !token &&
     (pathname === "/" ||
@@ -15,7 +15,7 @@ export function middleware(request) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Eğer token varsa ve kullanıcı login/register'a girmeye çalışıyorsa ana sayfaya at
+  // Token varsa ve auth sayfalarına girilmek isteniyorsa ana sayfaya yönlendir
   if (token && (pathname === "/login" || pathname === "/register")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -24,7 +24,6 @@ export function middleware(request) {
 }
 
 export const config = {
-  // Buraya korumak istediğin tüm yolları ekle
   matcher: [
     "/",
     "/transactions/:path*",
